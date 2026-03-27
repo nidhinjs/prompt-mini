@@ -58,7 +58,7 @@ def parse_framework_entries(content: str) -> dict[str, str]:
 
 class TestStacksMd:
     def setup_method(self):
-        self.content = STACKS.read_text()
+        self.content = STACKS.read_text(encoding="utf-8")
         self.entries = parse_framework_entries(self.content)
 
     def test_file_is_readable(self):
