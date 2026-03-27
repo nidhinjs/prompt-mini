@@ -30,7 +30,7 @@ ROOT = Path(__file__).parent.parent
 class TestPluginJson:
     def setup_method(self):
         self.path = ROOT / ".claude-plugin" / "plugin.json"
-        self.data = json.loads(self.path.read_text())
+        self.data = json.loads(self.path.read_text(encoding="utf-8"))
 
     def test_file_exists(self):
         assert self.path.exists()
@@ -69,7 +69,7 @@ class TestPluginJson:
 class TestHooksJson:
     def setup_method(self):
         self.path = ROOT / "hooks" / "hooks.json"
-        self.data = json.loads(self.path.read_text())
+        self.data = json.loads(self.path.read_text(encoding="utf-8"))
 
     def test_file_exists(self):
         assert self.path.exists()
@@ -114,7 +114,7 @@ class TestHooksJson:
 class TestMarketplaceJson:
     def setup_method(self):
         self.path = ROOT / ".dev-marketplace" / ".claude-plugin" / "marketplace.json"
-        self.data = json.loads(self.path.read_text())
+        self.data = json.loads(self.path.read_text(encoding="utf-8"))
 
     def test_file_exists(self):
         assert self.path.exists()
@@ -147,7 +147,7 @@ class TestMarketplaceJson:
 class TestSkillMd:
     def setup_method(self):
         self.path = ROOT / "skills" / "prompt-mini" / "SKILL.md"
-        self.content = self.path.read_text()
+        self.content = self.path.read_text(encoding="utf-8")
         self.lines = self.content.splitlines()
 
     def test_file_exists(self):
@@ -199,7 +199,7 @@ class TestReferenceFiles:
     def test_stacks_md_exists_and_nonempty(self):
         f = self.refs / "stacks.md"
         assert f.exists()
-        assert len(f.read_text().strip()) > 100
+        assert len(f.read_text(encoding="utf-8").strip()) > 100
 
     def test_question_patterns_md_exists(self):
         assert (self.refs / "question-patterns.md").exists()
@@ -225,7 +225,7 @@ class TestReferenceFiles:
 class TestEvaluatePromptScript:
     def setup_method(self):
         self.path = ROOT / "scripts" / "evaluate-prompt.py"
-        self.content = self.path.read_text()
+        self.content = self.path.read_text(encoding="utf-8")
 
     def test_file_exists(self):
         assert self.path.exists()
