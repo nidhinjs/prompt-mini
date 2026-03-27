@@ -32,7 +32,7 @@ Each entry follows this schema:
 ## WEB FRAMEWORKS
 
 ### Next.js App Router
-use-cases: webapp, saas, ai-app, api, dashboard
+use-cases: webapp, saas, ai-app, dashboard
 detect: next.config.*, app/ directory present, "next" in package.json
 
 prompt-context:
@@ -134,7 +134,7 @@ stop-conditions: Stop before modifying astro.config.mjs
 ---
 
 ### Vite + React
-use-cases: webapp, spa, dashboard, tool
+use-cases: webapp, spa, dashboard
 detect: vite.config.*, "react" and "vite" in package.json, no "next"
 
 prompt-context:
@@ -226,7 +226,7 @@ stop-conditions:
 ## DESKTOP
 
 ### Tauri 2
-use-cases: desktop, cross-platform-desktop
+use-cases: desktop, cross-platform
 detect: src-tauri/ present, tauri.conf.json present
 
 prompt-context:
@@ -249,7 +249,7 @@ stop-conditions:
 ---
 
 ### Electron
-use-cases: desktop, cross-platform-desktop
+use-cases: desktop, cross-platform
 detect: "electron" in package.json, main.js or main.ts at root
 
 prompt-context:
@@ -295,7 +295,7 @@ stop-conditions:
 ---
 
 ### VS Code Extension
-use-cases: vscode-extension, developer-tool
+use-cases: vscode-extension
 detect: .vscodeignore present, "vsce" in package.json, contributes in package.json
 
 prompt-context:
@@ -316,7 +316,7 @@ stop-conditions: Stop before modifying activation events in package.json
 ## BACKEND
 
 ### FastAPI
-use-cases: backend, api, ai-api, data
+use-cases: backend, ai-app, dashboard
 detect: "fastapi" in requirements.txt or pyproject.toml, main.py with FastAPI()
 
 prompt-context:
@@ -339,7 +339,7 @@ stop-conditions:
 ---
 
 ### NestJS
-use-cases: backend, api, enterprise
+use-cases: backend, enterprise
 detect: "nestjs" or "@nestjs/core" in package.json, src/main.ts with NestFactory
 
 prompt-context:
@@ -358,7 +358,7 @@ stop-conditions: Stop before modifying AppModule or database entities
 ---
 
 ### Hono
-use-cases: backend, api, edge, cloudflare-workers
+use-cases: backend, edge
 detect: "hono" in package.json
 
 prompt-context:
@@ -378,7 +378,7 @@ stop-conditions: Stop before modifying wrangler.toml
 ## AI / AGENTS
 
 ### Vercel AI SDK
-use-cases: ai-app, chatbot, streaming, saas
+use-cases: ai-app, saas
 detect: "ai" in package.json (Vercel AI SDK), useChat or useCompletion in code
 
 prompt-context:
@@ -398,7 +398,7 @@ stop-conditions: Stop before modifying .env or exposing API keys client-side
 ---
 
 ### LangChain.js / LangGraph
-use-cases: ai-agent, workflow, rag
+use-cases: ai-app
 detect: "@langchain" in package.json
 
 prompt-context:
@@ -417,7 +417,7 @@ stop-conditions: Stop before modifying the graph's state schema
 ---
 
 ### Anthropic SDK
-use-cases: ai-app, claude-integration, api
+use-cases: ai-app
 detect: "@anthropic-ai/sdk" in package.json
 
 prompt-context:
@@ -547,7 +547,7 @@ stop-conditions: Stop before modifying Clerk publishable keys or webhook config
 ## UI LIBRARIES
 
 ### Tailwind CSS 4
-use-cases: any
+use-cases: webapp, saas, mobile, desktop, extension, backend
 detect: "tailwindcss" >= 4 in package.json, @import "tailwindcss" in CSS
 
 prompt-context:
@@ -589,7 +589,7 @@ stop-conditions:
 ## DEPLOYMENT
 
 ### Vercel
-use-cases: webapp, saas, api, edge
+use-cases: webapp, saas, edge
 detect: vercel.json present, or Next.js project (Vercel is default)
 
 prompt-context:
@@ -602,12 +602,13 @@ pitfalls:
 - Forgets to add new env vars to Vercel project settings
 - Misses that Vercel Cron requires Pro plan
 
+scope-anchors: vercel.json, .vercel/
 stop-conditions: Stop before modifying vercel.json or environment variable names
 
 ---
 
 ### Cloudflare Workers
-use-cases: backend, api, edge, extension-backend
+use-cases: backend, edge, extension
 detect: wrangler.toml present, "wrangler" in package.json
 
 prompt-context:
