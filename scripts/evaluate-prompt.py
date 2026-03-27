@@ -62,6 +62,10 @@ VAGUE = [
     r"\b(full.?stack|from scratch|boilerplate|scaffold|end.?to.?end)\b",
 ]
 
+# Short or empty prompts — pass through silently
+if not prompt or len(prompt.strip()) < 12:
+    sys.exit(0)
+
 text = prompt.lower()
 words = len(text.split())
 clear_hits = sum(1 for s in CLEAR if re.search(s, text))
