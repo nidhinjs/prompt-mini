@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node (if tooling added later)
+node_modules/
+.npm
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Env / secrets
+.env
+.env.local
+.env.*
+
+# Claude Code local session files
+.claude/settings.local.json
+
+# Large assets not needed in repo
+assets/*.mp4
+assets/*.mov
+
+# Test artifacts
+tests/__pycache__/
