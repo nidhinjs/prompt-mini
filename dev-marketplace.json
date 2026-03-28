@@ -1,0 +1,12 @@
+{
+  "name": "local-dev",
+  "owner": {
+    "name": "nidhinjs"
+  },
+  "plugins": [
+    {
+      "name": "prompt-mini",
+      "source": "."
+    }
+  ]
+}
