@@ -1,0 +1,22 @@
+{
+  "name": "nidhinjs-marketplace",
+  "owner": {
+    "name": "nidhinjs"
+  },
+  "plugins": [
+    {
+      "name": "prompt-mini",
+      "source": {
+        "source": "url",
+        "url": "https://github.com/nidhinjs/prompt-mini.git"
+      },
+      "description": "Forges weak Claude Code prompts into structured, credit-saving, framework-aware prompts.",
+      "version": "0.1.0",
+      "author": {
+        "name": "nidhinjs"
+      },
+      "category": "productivity",
+      "keywords": ["prompts", "claude-code", "hooks", "developer-tools"]
+    }
+  ]
+}
