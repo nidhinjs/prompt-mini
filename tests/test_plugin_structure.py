@@ -55,12 +55,14 @@ class TestPluginJson:
     def test_required_field_license(self):
         assert "license" in self.data
 
-    def test_no_extra_plugin_directories_inside_claude_plugin(self):
-        """Only plugin.json should be inside .claude-plugin/ per official spec."""
+    def test_allowed_files_inside_claude_plugin(self):
+        """Only plugin.json and marketplace.json are allowed inside .claude-plugin/."""
         claude_plugin_dir = ROOT / ".claude-plugin"
-        contents = list(claude_plugin_dir.iterdir())
-        assert len(contents) == 1, (
-            f".claude-plugin/ should only contain plugin.json — found: {[f.name for f in contents]}"
+        allowed = {"plugin.json", "marketplace.json"}
+        found = {f.name for f in claude_plugin_dir.iterdir()}
+        unexpected = found - allowed
+        assert not unexpected, (
+            f".claude-plugin/ has unexpected files: {unexpected}"
         )
 
 
@@ -109,11 +111,11 @@ class TestHooksJson:
             )
 
 
-# ── Dev marketplace ───────────────────────────────────────────────────────────
+# ── Marketplace manifest ──────────────────────────────────────────────────────
 
 class TestMarketplaceJson:
     def setup_method(self):
-        self.path = ROOT / ".dev-marketplace" / ".claude-plugin" / "marketplace.json"
+        self.path = ROOT / ".claude-plugin" / "marketplace.json"
         self.data = json.loads(self.path.read_text(encoding="utf-8"))
 
     def test_file_exists(self):
@@ -135,11 +137,11 @@ class TestMarketplaceJson:
         for plugin in self.data["plugins"]:
             assert "source" in plugin
 
-    def test_source_resolves_to_repo_root(self):
-        """./../../ from .dev-marketplace/.claude-plugin/ should resolve to repo root."""
+    def test_source_has_url(self):
+        """Marketplace source should specify a URL for GitHub distribution."""
         source = self.data["plugins"][0]["source"]
-        resolved = (self.path.parent / source).resolve()
-        assert resolved == ROOT.resolve()
+        assert isinstance(source, dict), "source must be an object with type and url"
+        assert "url" in source or "source" in source
 
 
 # ── SKILL.md structure ────────────────────────────────────────────────────────
