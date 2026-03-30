@@ -250,3 +250,35 @@ class TestEvaluatePromptScript:
     def test_never_uses_system_message(self):
         """systemMessage is not a valid field in the official spec."""
         assert "systemMessage" not in self.content
+
+
+# ── setup.py ──────────────────────────────────────────────────────────────────
+
+class TestSetupPy:
+    def setup_method(self):
+        self.path = ROOT / "setup.py"
+        self.content = self.path.read_text(encoding="utf-8")
+
+    def test_file_exists(self):
+        assert self.path.exists()
+
+    def test_has_shebang(self):
+        assert self.content.startswith("#!/usr/bin/env python3")
+
+    def test_uses_sys_executable_not_hardcoded_python(self):
+        """Must use sys.executable — hardcoded python3 breaks on Windows."""
+        assert "sys.executable" in self.content
+
+    def test_targets_settings_json(self):
+        assert "settings.json" in self.content
+
+    def test_idempotent_removes_old_entries(self):
+        """Must clean up prior entries before adding a new one."""
+        assert "evaluate-prompt" in self.content or "prompt-mini.py" in self.content
+
+    def test_reads_with_utf8_sig_for_bom_safety(self):
+        """Must use utf-8-sig when reading — Windows tools write a BOM that breaks utf-8 json.load."""
+        assert 'encoding="utf-8-sig"' in self.content
+
+    def test_writes_utf8(self):
+        assert 'encoding="utf-8"' in self.content

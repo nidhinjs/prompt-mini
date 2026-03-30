@@ -95,7 +95,7 @@ PROCEED IMMEDIATELY if:
 
 ONLY invoke the prompt-mini skill if genuinely vague (missing scope, target files, or stack clarity):
   1. Briefly note why: "prompt-mini flagged this as vague because [specific reason]."
-  2. Invoke the prompt-mini skill — it will ask ≤5 clarifying questions and assemble a structured prompt
+  2. Invoke the prompt-mini skill — it will ask ≤5 clarifying questions, then EXECUTE the forged prompt immediately (no copy-paste step)
   3. Trust user intent. Check conversation history before invoking the skill.
 
 If clear: proceed with the original request. If vague: invoke the skill.""")

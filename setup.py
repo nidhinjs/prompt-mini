@@ -1,80 +1,74 @@
 #!/usr/bin/env python3
 """
-prompt-mini setup — registers the UserPromptSubmit hook in ~/.claude/settings.json
-Run once after installing the plugin:
-    python3 setup.py
+setup.py — Install the prompt-mini UserPromptSubmit hook into ~/.claude/settings.json
+
+Run once after cloning:
+    python setup.py
+
+Uses the current Python executable — works on Windows, macOS, and Linux.
+Safe to run multiple times — idempotent.
 """
 import json
-import os
 import sys
-import shutil
 from pathlib import Path
 
-HOOK_NAME = "prompt-mini"
-SCRIPT_NAME = "prompt-mini.py"
-CLAUDE_DIR = Path.home() / ".claude"
-HOOKS_DIR = CLAUDE_DIR / "hooks"
-SETTINGS_FILE = CLAUDE_DIR / "settings.json"
-SOURCE_SCRIPT = Path(__file__).parent / "scripts" / "evaluate-prompt.py"
-DEST_SCRIPT = HOOKS_DIR / SCRIPT_NAME
+REPO_ROOT = Path(__file__).parent.resolve()
+SCRIPT = REPO_ROOT / "scripts" / "evaluate-prompt.py"
+SETTINGS = Path.home() / ".claude" / "settings.json"
 
 
 def main():
-    print("prompt-mini setup")
-    print("-" * 40)
-
-    # Step 1 — Copy hook script to ~/.claude/hooks/
-    HOOKS_DIR.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(SOURCE_SCRIPT, DEST_SCRIPT)
-    print(f"✓ Copied hook script to {DEST_SCRIPT}")
-
-    # Step 2 — Load or create settings.json
-    if SETTINGS_FILE.exists():
-        try:
-            settings = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
-        except json.JSONDecodeError:
-            settings = {}
+    if SETTINGS.exists():
+        # utf-8-sig strips the BOM that Windows tools (Notepad, some editors) write
+        with open(SETTINGS, encoding="utf-8-sig") as f:
+            try:
+                settings = json.load(f)
+            except json.JSONDecodeError:
+                settings = {}
     else:
         settings = {}
+        SETTINGS.parent.mkdir(parents=True, exist_ok=True)
 
-    # Step 3 — Build the hook entry
-    python_cmd = "python3" if shutil.which("python3") else "python"
-    hook_command = f'{python_cmd} "{DEST_SCRIPT}"'
+    python_exe = sys.executable
+    script_path = str(SCRIPT)
+    command = f'"{python_exe}" "{script_path}"'
 
-    hook_entry = {
+    new_entry = {
         "hooks": [
             {
                 "type": "command",
-                "command": hook_command,
-                "description": "prompt-mini — forges vague prompts before execution"
+                "command": command,
+                "description": "prompt-mini -- forges vague prompts before execution"
             }
         ]
     }
 
-    # Step 4 — Add to UserPromptSubmit, avoid duplicates
-    hooks = settings.setdefault("hooks", {})
-    existing = hooks.setdefault("UserPromptSubmit", [])
+    settings.setdefault("hooks", {}).setdefault("UserPromptSubmit", [])
 
-    # Remove any old prompt-mini entry
-    existing[:] = [
-        h for h in existing
-        if not any(HOOK_NAME in str(hook.get("command", "")) for hook in h.get("hooks", []))
+    # Remove any existing prompt-mini entries (idempotent)
+    settings["hooks"]["UserPromptSubmit"] = [
+        entry for entry in settings["hooks"]["UserPromptSubmit"]
+        if not any(
+            "evaluate-prompt" in hook.get("command", "")
+            or "prompt-mini.py" in hook.get("command", "")
+            or "prompt-mini" in hook.get("command", "")
+            for hook in entry.get("hooks", [])
+        )
     ]
 
-    existing.append(hook_entry)
-    settings["hooks"]["UserPromptSubmit"] = existing
+    settings["hooks"]["UserPromptSubmit"].append(new_entry)
 
-    # Step 5 — Write settings.json
-    SETTINGS_FILE.write_text(
-        json.dumps(settings, indent=2),
-        encoding="utf-8"
-    )
-    print(f"✓ Registered hook in {SETTINGS_FILE}")
+    with open(SETTINGS, "w", encoding="utf-8") as f:
+        json.dump(settings, f, indent=2)
+
+    print(f"[OK] Hook registered in {SETTINGS}")
+    print(f"     Python : {python_exe}")
+    print(f"     Script : {script_path}")
     print()
-    print("✅ Done. Restart Claude Code for the hook to take effect.")
+    print("Restart Claude Code for the hook to take effect.")
     print()
     print("To verify: open Claude Code, type /hooks, click UserPromptSubmit")
-    print("You should see: prompt-mini — forges vague prompts before execution")
+    print("You should see: prompt-mini -- forges vague prompts before execution")
 
 
 if __name__ == "__main__":
