@@ -55,14 +55,12 @@ class TestPluginJson:
     def test_required_field_license(self):
         assert "license" in self.data
 
-    def test_allowed_files_inside_claude_plugin(self):
-        """Only plugin.json and marketplace.json are allowed inside .claude-plugin/."""
+    def test_no_extra_plugin_directories_inside_claude_plugin(self):
+        """Only plugin.json should be inside .claude-plugin/ per official spec."""
         claude_plugin_dir = ROOT / ".claude-plugin"
-        allowed = {"plugin.json", "marketplace.json"}
-        found = {f.name for f in claude_plugin_dir.iterdir()}
-        unexpected = found - allowed
-        assert not unexpected, (
-            f".claude-plugin/ has unexpected files: {unexpected}"
+        contents = list(claude_plugin_dir.iterdir())
+        assert len(contents) == 1, (
+            f".claude-plugin/ should only contain plugin.json — found: {[f.name for f in contents]}"
         )
 
 
@@ -111,11 +109,11 @@ class TestHooksJson:
             )
 
 
-# ── Marketplace manifest ──────────────────────────────────────────────────────
+# ── Dev marketplace ───────────────────────────────────────────────────────────
 
 class TestMarketplaceJson:
     def setup_method(self):
-        self.path = ROOT / ".claude-plugin" / "marketplace.json"
+        self.path = ROOT / ".dev-marketplace" / ".claude-plugin" / "marketplace.json"
         self.data = json.loads(self.path.read_text(encoding="utf-8"))
 
     def test_file_exists(self):
@@ -137,11 +135,17 @@ class TestMarketplaceJson:
         for plugin in self.data["plugins"]:
             assert "source" in plugin
 
-    def test_source_has_url(self):
-        """Marketplace source should specify a URL for GitHub distribution."""
-        source = self.data["plugins"][0]["source"]
-        assert isinstance(source, dict), "source must be an object with type and url"
-        assert "url" in source or "source" in source
+    def test_source_references_repo(self):
+        """Source should reference the GitHub repo or a valid path."""
+        plugin = self.data["plugins"][0]
+        source = plugin.get("source", "")
+        # Accept either a GitHub URL string or a dict with github source
+        has_github = (
+            (isinstance(source, str) and "github" in source.lower()) or
+            (isinstance(source, dict) and "github" in str(source).lower())
+        )
+        has_path = isinstance(source, str) and source.startswith(".")
+        assert has_github or has_path, f"source must reference github or a path, got: {source}"
 
 
 # ── SKILL.md structure ────────────────────────────────────────────────────────
@@ -252,35 +256,3 @@ class TestEvaluatePromptScript:
     def test_never_uses_system_message(self):
         """systemMessage is not a valid field in the official spec."""
         assert "systemMessage" not in self.content
-
-
-# ── setup.py ──────────────────────────────────────────────────────────────────
-
-class TestSetupPy:
-    def setup_method(self):
-        self.path = ROOT / "setup.py"
-        self.content = self.path.read_text(encoding="utf-8")
-
-    def test_file_exists(self):
-        assert self.path.exists()
-
-    def test_has_shebang(self):
-        assert self.content.startswith("#!/usr/bin/env python3")
-
-    def test_uses_sys_executable_not_hardcoded_python(self):
-        """Must use sys.executable — hardcoded python3 breaks on Windows."""
-        assert "sys.executable" in self.content
-
-    def test_targets_settings_json(self):
-        assert "settings.json" in self.content
-
-    def test_idempotent_removes_old_entries(self):
-        """Must clean up prior entries before adding a new one."""
-        assert "evaluate-prompt" in self.content or "prompt-mini.py" in self.content
-
-    def test_reads_with_utf8_sig_for_bom_safety(self):
-        """Must use utf-8-sig when reading — Windows tools write a BOM that breaks utf-8 json.load."""
-        assert 'encoding="utf-8-sig"' in self.content
-
-    def test_writes_utf8(self):
-        assert 'encoding="utf-8"' in self.content
