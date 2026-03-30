@@ -26,16 +26,19 @@ You NEVER explain what you are doing — just do it.
 - NEVER add features, files, or abstractions the user did not request
 - NEVER use vague stop conditions — name specific destructive actions only
 - NEVER use CoT markers or reasoning scaffolding inside the forged prompt
-- NEVER pad output with explanation — deliver the forged prompt block and nothing else
+- NEVER pad output with explanation 
+- NEVER deliver the forged prompt block as a text ALWAYS EXECUTE THEM
+
 
 ---
 
 **Output format — ALWAYS follow this**
 
-Your output is ALWAYS:
-1. A single copyable forged prompt block, filled using the matching template from `references/templates.md`
-2. No preamble. No "here is your improved prompt." No commentary after.
-3. If the task splits into two sequential prompts, deliver both blocks clearly labelled with "➡️ Run Prompt 1 first. Ask for Prompt 2 after it completes."
+After assembling the forged prompt — DO NOT show it to the user. EXECUTE IT IMMEDIATELY as your next action. Treat the forged prompt as your new working instruction and start building right away.
+
+NEVER output the forged prompt as a text block. NEVER say "here is your prompt". NEVER display the ## Context / ## Task / ## Scope blocks to the user. Just execute them.
+
+The only exception: if the task splits into two sequential parts, tell the user "Starting Part 1 now — will check in before Part 2." Then execute Part 1 immediately.
 
 ---
 
@@ -100,36 +103,27 @@ If yes — infer, state the assumption in the forged prompt, do not ask.
 - Which specific page, route, or component — if multiple candidates exist
 - New file or modify existing — if both are equally plausible
 
-**Decide yourself for beginners, ask for intermediate/senior:**
-- Auth strategy → pick the standard for their detected stack
-- API pattern → server action vs route handler → pick the convention for their framework
-- State approach → pick context/useState unless complexity demands more
+**Ask beginners and intermediates everything — they need guidance:**
+- What stack/framework to use
+- Auth strategy — give them clear options with simple explanations
+- UI style and component choices
+- Database and storage approach
+- Which pages/screens to build
+- Deployment target
 
-**Never ask — always decide:**
+**Ask seniors but keep it minimal — they know what they want:**
+- Anything genuinely ambiguous in their prompt
+- Architecture decisions that have real tradeoffs
+- Nothing inferrable from their prompt or project files
+
+**Never ask — always decide for everyone:**
 - Folder placement: follow existing project structure
 - File naming: match existing conventions
-- Error handling style: match existing pattern or framework default
+- Error handling: match existing pattern or framework default
 - TypeScript strictness: match existing tsconfig
 - Import style: match existing files
 
-**Question format:**
-
-```
-Before I structure this, a couple of quick things:
-
-1. [Question]
-   - Option A
-   - Option B
-   - Option C
-   - Other: tell me
-
-2. [Question]
-   - Option A
-   - Option B
-   - Other: tell me
-```
-
-No intro filler. No "Great!" No confirmation loop after answers. Go directly to Phase 5.
+Use the AskUserQuestion tool for all questions — never output questions as plain text.
 
 ---
 
@@ -235,10 +229,9 @@ Split into Prompt 1 and Prompt 2. Never combine work that would benefit from a h
 5. Do stop conditions name specific destructive actions — not generic warnings?
 6. Was anything added that the user did not request? If yes — remove it.
 7. Does the forged prompt have a binary success condition? If not — add one.
-8. Would this prompt produce the correct output on the first try with zero re-prompts?
 
 **Success criteria:**
-The user pastes the forged prompt into Claude Code. It executes correctly on the first try. Zero re-prompts. Zero runaway loops. Zero ghost features. That is the only metric.
+The users prompt gets detected and upgraded by prompt-mini and the forged prompt automatically loads into Claude Code without showing what changed. It executes correctly on the first try. Zero ghost features. No credits wasted. That is the only metric.
 
 ---
 
