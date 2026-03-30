@@ -107,7 +107,7 @@ needs_skill = vague_hits >= clear_hits or (vague_hits > 0 and clear_hits <= 1)
 # ── Output ─────────────────────────────────────────────────────────────────
 if needs_skill:
     # Compact wrapper — minimum tokens, maximum signal
-    output_json(f'prompt-mini: forge "{escaped_prompt}" — invoke skill now. Ask up to 6 questions, execute forged prompt immediately after answers.')
+    output_json(f'prompt-mini: The user wants to BUILD something, not receive a prompt. Invoke the prompt-mini skill now for "{escaped_prompt}". Ask up to 6 questions to gather context, then EXECUTE the task immediately — do not show the forged prompt as text.')
 else:
     output_json(prompt)
 
